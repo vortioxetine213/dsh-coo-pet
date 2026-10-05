@@ -1,0 +1,37 @@
+{
+  "name": "dsh-coo-pet",
+  "version": "0.1.0",
+  "description": "DSH 桌宠:把 Coopanion 那只鲸鱼女仆接到 DSH 上——她住在你的桌面、有自己的记忆,还能跟 Coopanion 里的另一只鲸鲸 Coo 聊天。(需要先装好 Coopanion)",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis",
+    "desktop-pet",
+    "coopanion",
+    "whale",
+    "pet"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "*"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

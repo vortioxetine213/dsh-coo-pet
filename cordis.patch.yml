@@ -1,0 +1,30 @@
+# DSH 桌宠 bundle patch —— 声明怎么把插件挂进 DSH。
+#
+# 先决条件:装好 Coopanion(桌宠的窗口与页面素材都来自它)。
+# 插件启动时会自己找它的安装目录;找不到就用下面的 `cooRoot` 显式指定。
+#
+# 配置项(都有默认值,一般不用写):
+#   cooRoot      Coopanion 的安装目录(默认自动探测几个常见位置)
+#   petExe       Coopanion.exe 的路径(默认取 cooRoot 下的那个)
+#   cooDataRoot  Coopanion 的 data 目录(用来读它的控制台端口与 bot 名字)
+#   cooPort      覆盖 Coopanion 的控制台端口(默认自动读)
+#   user         桌宠对你的称呼
+#   autoStart    装上就让她上桌(默认 true)
+#   port         桌宠页面服务器端口(默认让系统分配一个)
+#   brain        她的大脑用哪一种:
+#                local   = 插件内自己维护的独立会话,只调 llm——轻、快、省 token;
+#                session = DSH 里的一个独立会话(会话列表里看得见、原生持久化),
+#                          但每一轮都会带上 preset 的完整系统提示与工具定义,
+#                          明显更费 token,而且桌宠手里会拿到工具。
+#   skin         她的形象与配色(scheme 可选:deepseek / harness / chatgpt /
+#                claude / gemini / qwen / kimi / minimax)
+#   chatRounds   桌宠身上那个按钮、以及 /pet-chat 不带数字时的默认来回数
+- insert:
+    - id: dsh-coo-pet
+      name: dsh-coo-pet
+      config:
+        autoStart: true
+        brain: session
+        skin:
+          scheme: harness
+        chatRounds: 3

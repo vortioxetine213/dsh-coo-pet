@@ -11,6 +11,14 @@
     "whale",
     "pet"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vortioxetine213/dsh-coo-pet.git"
+  },
+  "homepage": "https://github.com/vortioxetine213/dsh-coo-pet#readme",
+  "bugs": {
+    "url": "https://github.com/vortioxetine213/dsh-coo-pet/issues"
+  },
   "type": "module",
   "main": "lib/index.js",
   "exports": {

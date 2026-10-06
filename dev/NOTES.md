@@ -76,6 +76,18 @@ Windows 上那个文件被 DSH 自己占着,pnpm 的 `rename` 偶尔失败,后�
 更麻烦的是这次失败会被 Cordis 记住,之后怎么重装都报 `failed to import`。
 遇到就手动把 `bundles` 补齐;实在不行换个包名重装(新名字没有那份缓存)。
 
+### 8. `sessionController` 要「等一等再拿」
+
+本插件的 `inject` 里**故意没有**声明 `sessionController` —— 声明了的话,某个没有这个服务的
+profile 会让整个插件起不来。代价是它可能在插件 `apply` **之后**才注册好:那一刻
+`ctx.get('sessionController')` 拿到的是 `undefined`,代码就静默退回 `local`。
+
+桌面上的表现是「她照常说话,但 DSH 会话里什么都看不到、`pet-whale` 从某个时间点起再没被
+写过、记忆也不沿用」—— 很容易被当成"会话功能坏了",其实只是取服务取早了。
+
+现在 `impl.js` 会等最多 10 秒(每 250ms 问一次),并且 `pet_status` 会明确报出降级原因:
+「没拿到 sessionController」和「会话后端出错降级」是两种不同情况,别混。
+
 ## 验证记录
 
 | 验证项 | 怎么验的 | 结果 |

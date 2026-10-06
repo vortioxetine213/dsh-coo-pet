@@ -33,12 +33,12 @@ try {
   $added = @(
     '',
     '# GitHub direct connect (dsh-coo-pet)',
-    '140.82.113.3 github.com',
-    '140.82.113.3 www.github.com',
+    '140.82.112.3 github.com',
+    '140.82.112.3 www.github.com',
     '185.199.108.133 raw.githubusercontent.com',
     '185.199.108.133 objects.githubusercontent.com',
-    '140.82.113.9 codeload.github.com',
-    '140.82.113.3 gist.github.com'
+    '140.82.112.3 codeload.github.com',
+    '140.82.112.3 gist.github.com'
   )
 
   Set-Content -Path $hosts -Value ($kept + $added) -Encoding ASCII

@@ -1,0 +1,40 @@
+NOTICE
+======
+
+This project (dsh-coo-pet) contains only original code, and is licensed under
+the MIT License -- see the LICENSE file.
+
+It does NOT include and does NOT redistribute any part of Coopanion, nor of its
+`cortico-world-desktop-pet` package. The pet's window, its pages and its figure
+assets belong to that project and are read at runtime from the user's own
+Coopanion installation -- see `lib/assets.mjs`.
+
+Facts behind that decision:
+
+* `cortico-world-desktop-pet` is licensed AGPL-3.0-or-later.
+* The artwork under `web/whale/` is stated in that package's THIRD_PARTY_NOTICES
+  to fall OUTSIDE its AGPL grant.
+* That artwork carries trademarks of DeepSeek, OpenAI, Anthropic, Google,
+  Alibaba Cloud, Moonshot AI and MiniMax.
+
+So no third-party code and no third-party artwork is bundled here. Users install
+Coopanion themselves and are bound by its own license terms.
+
+Coopanion: https://github.com/Pal-AI-Lab/Coopanion
+
+------------------------------------------------------------------------------
+
+关于 Coopanion 的素材(中文)
+
+本项目的代码是原创的,按 MIT 授权(见 LICENSE)。
+
+它不包含、也不分发 Coopanion 及其 `cortico-world-desktop-pet` 包里的任何东西。
+桌宠的窗口、页面与形象属于那个项目,由插件在**运行时**从用户自己安装的
+Coopanion 里读取(见 `lib/assets.mjs`)。
+
+原因:`cortico-world-desktop-pet` 是 AGPL-3.0-or-later;而 `web/whale/` 的贴图
+在原包的 THIRD_PARTY_NOTICES 里被明确写在 AGPL 授权范围之外,并且带有上述几家
+公司的商标图形。
+
+因此本仓库里没有第三方的代码与图片,用户需要自行安装 Coopanion 并遵守它自己的
+许可条款。

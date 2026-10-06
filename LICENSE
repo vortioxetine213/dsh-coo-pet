@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 dsh-desktop-pet contributors
+Copyright (c) 2026 vortioxetine213
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,17 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----------------------------------------------------------------------------
-
-关于 Coopanion 的页面素材(重要):
-
-本项目的代码是原创的,但**桌宠的页面与形象不包含在本项目里**。
-
-`pet.html` / `pet-app.js` / `pet.css` / `web/whale/` 的贴图等文件出自
-Coopanion 的 `cortico-world-desktop-pet` 包(AGPL-3.0;其中 `web/whale/` 的贴图
-连该许可都不覆盖,原作者声明"不在授权范围内",且带有 DeepSeek、OpenAI、
-Anthropic、Google、阿里云、月之暗面、MiniMax 的商标图形)。
-
-因此本插件**不分发这些文件**,而是在运行时从用户自己安装的 Coopanion 里读取
-(见 `lib/assets.mjs`)。用户需要自行安装 Coopanion,并遵守它自己的许可条款。

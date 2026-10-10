@@ -88,6 +88,80 @@ profile 会让整个插件起不来。代价是它可能在插件 `apply` **之�
 现在 `impl.js` 会等最多 10 秒(每 250ms 问一次),并且 `pet_status` 会明确报出降级原因:
 「没拿到 sessionController」和「会话后端出错降级」是两种不同情况,别混。
 
+### 9. Coopanion 升级会打断三件事
+
+页面素材是**运行时要来的**,所以它每次升级都会动到我们几个地方。0.1.16 → 0.1.21
+实测三处全中:
+
+**① 副本会变旧。** `ensureAssets` 原来只在副本不存在时才拷,升级之后就一直是**旧页面配
+新宿主**(页面照样能开,自己看不出来)。现在按源目录 `pet-app.js` 的「字节数:修改时间」
+记指纹,存在副本目录的 `.source-stamp` 里;对不上就**清空重拷**。
+
+顺带修了个小问题:`cpSync` 只覆盖、不删除,升级时被删的文件会留在副本里(实测多出 4 个)。
+现在重拷前先 `rmSync(dest)`。
+
+**② 补丁锚点会失效。** 0.1.21 里 `ctl.setThinking` 那行整个没了,`typeof p.thinking`
+这个锚点直接失守。所以 `insert` 现在收**一组**锚点、依次试第一个命中的:
+
+```js
+"  if (typeof p.doubleClickChat === 'boolean') prefs.doubleClickChat = p.doubleClickChat;\n",  // 0.1.19+
+"  if (typeof p.thinking === 'boolean') ctl.setThinking(p.thinking);\n",                       // 更早
+"  if (typeof p.lockFrameRate === 'boolean') prefs.lockFrameRate = p.lockFrameRate;\n",        // 兜底
+```
+
+**③ `/api/figures` 缺字段会让页面整个崩掉。** 这条最难查,单独说:
+
+新版页面的 `body-host.js` 会读形象包清单里的 **`vocab`**(形象「会说的词」):
+
+```js
+if (Array.isArray(m.words)) words = pack.vocab.map((w) => w.id).filter(...)   // 没有防御
+```
+
+我们的 `pet-server.figures()` 只透传了 `id/base/name/thumb/entry/export/model/axes/presets`,
+没有 `vocab` → `pack.vocab` 是 `undefined` → **未捕获的 promise 异常** → **页面完全画不出
+东西**。而窗口本身还在跑、WebSocket 也连着,`pet_status` 一切正常 —— 桌面上就是
+「桌宠没出现」,和当年那个 Chromium 抢 GPU 缓存的症状一模一样,**极易误判**。
+
+现在 `figures()` 会透传 `vocab`(保证是数组)、`version`、`about`。
+
+> 查这类"窗口在、气泡通、就是没画面"的问题,用 `dev/page-errors.mjs`:
+> 它通过 CDP 重载页面并订阅 `Runtime.exceptionThrown`,能把堆栈打出来。
+> `dev/serve.mjs --debug-port=9333` + 这个脚本,几分钟就能定位。
+
+**每次 Coopanion 升级后要做的事**:
+
+1. `node dev/patch-test.mjs` —— 三个补丁还打得上吗(有 ⚠️ 就是锚点断了);
+2. 重启插件,`pet_status` 看窗口和气泡;
+3. 万一桌面上没有她,`dev/serve.mjs --debug-port=9333` + `dev/page-errors.mjs` 看页面报什么。
+
+### 10. 音效被自己静音了(一条挺阴的事故链)
+
+`snapshot` 里原来写的是 `sound: false`(本意"别吵到主人"),后果却是**永久静音**:
+
+1. 页面拿到 `false` → `sfx.set(false)`;
+2. 而 `data/web/sound.js` 的 `set()` 会把 `'off'` **写进 localStorage**;
+3. 从此每次开窗口都从静音起步 —— **换窗口、重装插件都没用**,因为存在 Chromium profile 里;
+4. 更要命的是**那个音效按钮是单向的**:页面只发 `{t:'prefs',sound}` 给宿主、等宿主推回来才改本地,
+   而宿主从来**不回推** → 一旦哑了就再也开不回来。
+
+现在:snapshot 推 `sound: soundOn`(默认 true),而且**每次页面连上都会推一遍**,所以她自己能从
+历史遗留的 `'off'` 里恢复;`onMessage` 也收下页面的 `{t:'prefs',sound}` 并广播回去,那个按钮
+才算真的能用。
+
+> 教训:`snapshot` 里给的每个字段都是一次**写入**。给 `false` 不叫"默认关",叫"关掉并存档"。
+> 相关代码:`lib/impl.js` 的 `soundOn` / `snapshot` / `onMessage`,`data/web/sound.js` 的 `set`。
+
+**同一天还踩了同一类问题的另一半**:
+
+- `frameRate` **没给** → 吃页面默认的 `60`,于是最高只能 60 帧(而 Coopanion 自己那只满刷新率跑);
+- `lockFrameRate` 给了 `true` → **静止**时也按满帧率重画整个形象,白烧 GPU。
+
+现在 `frameRate: 0`(不限帧,跟着显示器刷新率走,144Hz 屏就是 144)+ `lockFrameRate: false`
+(静止时降到 `RESTING_FPS = 30`,和 Coopanion 的默认一致)。
+
+一句话总结:**`snapshot` 里的每个字段都要当成"我要写下去这个值"来对待** —— 没给不等于默认,
+而是"让页面自己决定";给了就得想清楚这个值写下去意味着什么。
+
 ## 验证记录
 
 | 验证项 | 怎么验的 | 结果 |

@@ -162,6 +162,47 @@ if (Array.isArray(m.words)) words = pack.vocab.map((w) => w.id).filter(...)   //
 一句话总结:**`snapshot` 里的每个字段都要当成"我要写下去这个值"来对待** —— 没给不等于默认,
 而是"让页面自己决定";给了就得想清楚这个值写下去意味着什么。
 
+### 11. 「服装」按钮没实装 / 换装页里没有服装选项
+
+Coopanion 0.1.24 给形象包加了 `outfit` 轴(女仆装 / 冬装),要让它能用得接三处,缺一处都不行:
+
+**① 换装页的入口。** 页面里的 `dress` 动作有三个分支:
+
+```js
+if (prefs.bot?.buttons?.dress) send({ t: 'control', action: 'dress' });   // 交给宿主
+else if (host?.openDress) host.openDress();
+else window.open('/dress', '_blank');                                     // 兜底
+```
+
+`bot.buttons.dress` 原来是 `false`,于是走了兜底那条 —— 在**全屏透明的桌宠窗口**里开新标签,
+人眼什么都看不到,**看起来按钮就是坏的**。现在设成 `true`,由插件用系统浏览器打开
+(`openInBrowser`,Windows 上就是 `cmd /c start "" <url>`)。
+
+**② 服务器上得真有那个页面。** `PAGES` 里要加 `/dress` → `dress.html`,
+还要有 `POST /api/skin`(保存外观)。
+
+**③ `/api/figures/status` 的字段名要和页面对齐。** 这条最坑:
+
+```js
+// 页面读的是这几个
+if (packStatus.problems.length) { ... }      // dress.js:212
+if (packStatus.importable) { ... }           // dress.js:204
+// 我们一开始回的是 canImport / canImportDirs —— 名字全对不上
+```
+
+`packStatus.problems` 是 `undefined`,**`.length` 当场抛 TypeError**,于是
+`renderFigure` 在渲染完形象列表之后就中断了 —— **服装那一行一行都没出来**。
+表现是"换装页里只有形象选择、没有服装",但页面**不报白屏**、控制台也只有一行不起眼的
+TypeError,很容易以为是"轴没传过去"。
+
+> 排查用 `dev/page-errors.mjs --url=/dress`(它通过 CDP 重载页面并打印异常堆栈),
+> 配合 `dev/inspect.mjs "<表达式>" --url=/dress` 看 `document.querySelectorAll('.pack-axis').length`。
+> 这两个脚本都支持 `--url=` 选页面了。
+
+**④ 另外记住:`outfit` 不是独立字段,它拼在 `scheme` 里。** 各轴的 option 用 `-` 连接,
+顺序按形象包 `axes` 的顺序 —— 所以「灰黑配色 + 冬装」是 `scheme: "harness-cape"`。
+`normalizeSkin` 只认 `figure/scheme/palette` + `coo` 那四个配件槽,别的字段一律丢掉。
+
 ## 验证记录
 
 | 验证项 | 怎么验的 | 结果 |

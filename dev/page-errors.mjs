@@ -15,7 +15,11 @@ const port = (() => {
 })();
 
 const targets = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
-const page = targets.filter((t) => t.type === 'page').find((p) => p.url.includes('/pet')) ?? targets.find((t) => t.type === 'page');
+const want = process.argv.slice(2).find((a) => a.startsWith('--url='))?.slice('--url='.length);
+const pages = targets.filter((t) => t.type === 'page');
+const page = want
+  ? (pages.find((p) => p.url.includes(want)) ?? pages[0])
+  : (pages.find((p) => p.url.includes('/pet')) ?? pages[0]);
 if (!page) {
   console.error('没有可调试的页面,serve.mjs 带 --debug-port 起了吗?');
   process.exit(1);

@@ -16,8 +16,12 @@
 #                session = DSH 里的一个独立会话(会话列表里看得见、原生持久化),
 #                          但每一轮都会带上 preset 的完整系统提示与工具定义,
 #                          明显更费 token,而且桌宠手里会拿到工具。
-#   skin         她的形象与配色(scheme 可选:deepseek / harness / chatgpt /
-#                claude / gemini / qwen / kimi / minimax)
+#   skin         她的形象与配色:
+#                scheme 配色:deepseek / harness / chatgpt / claude / gemini /
+#                       qwen / kimi / minimax
+#                outfit 服装:maid(女仆装)/ cape(冬装)
+#                       —— 这两个轴的定义在形象包的 figure.json 里,
+#                          随 Coopanion 升级增加(冬装是 0.1.24 起才有的)
 #   chatRounds   桌宠身上那个按钮、以及 /pet-chat 不带数字时的默认来回数
 - insert:
     - id: dsh-coo-pet
@@ -27,4 +31,5 @@
         brain: session
         skin:
           scheme: harness
+          outfit: maid
         chatRounds: 3

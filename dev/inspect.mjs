@@ -25,7 +25,11 @@ if (args.includes('--list')) {
   for (const p of pages) console.log(`${p.title}\t${p.url}\t${p.webSocketDebuggerUrl}`);
   process.exit(0);
 }
-const page = pages.find((p) => p.url.includes('/pet')) ?? pages[0];
+const page = (() => {
+  const want = args.find((a) => a.startsWith('--url='))?.slice('--url='.length);
+  if (want) return pages.find((p) => p.url.includes(want)) ?? pages[0];
+  return pages.find((p) => p.url.includes('/pet')) ?? pages[0];
+})();
 if (!page) {
   console.error('没有可调试的页面');
   process.exit(1);
